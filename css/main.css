@@ -1,0 +1,31 @@
+td, th {
+    padding: 2px 4px 2px 4px;
+}
+
+#agg_table td {
+    min-width: 110px;
+}
+
+h1 {
+    margin-bottom: 15px;
+}
+
+
+table {
+    margin-bottom: 40px;
+}
+
+.header {
+    background-image: url(../img/sort_both.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+
+ul {
+    margin-top: 20px;
+}
+
+.bs-sidebar ul li {
+    font-size: 16px;
+}
