@@ -66,12 +66,10 @@ def get_arin_data():
         rows.append(row)
     
         if not rank % 100:
-            print "indexed %s" % rank   
+            print "indexed %s" % rank
     
         rank += 1
         time.sleep(1)
-        print row
-    
     
     with open('top_2000.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')
