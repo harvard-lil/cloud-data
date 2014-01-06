@@ -213,6 +213,30 @@ def get_aggregate_table(result_file, cloud_providers):
         for row in rows:
             if row[3] > 0:
                 print row
+                
+def sum_cloud_providers(result_file):
+    """
+    A helper to sum cloud providers
+    """
+    
+    ignore_list = ['RIPE', 'APNIC', 'AFRINIC', 'LACNIC']
+    
+    total = 0
+    sums = [0,0,0,0,0,0]
+    
+    with open(result_file, 'rb') as csvfile:
+        rows = csv.reader(csvfile, delimiter=',')
+        for row in rows:
+                if row[5] not in ignore_list:
+                    total += 1
+                    sums[int(row[3])] += 1
+                    
+    print "total %s names" % total
+    
+    for sum in sums:
+        perc = "{0:.2f}%".format(float(sum)/total * 100)
+        print "<td>%s or %s</td>" % (sum, perc)
+
 
 if __name__ == "__main__":
     """
@@ -237,6 +261,7 @@ if __name__ == "__main__":
     
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
-    get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
+    #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
+    sum_cloud_providers('data/results/crunchbase_2010.csv')
     #convert_to_table('top_2000.csv')
     #get_aggregate_table('top_2000.csv')

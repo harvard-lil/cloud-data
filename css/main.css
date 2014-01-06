@@ -2,6 +2,12 @@ td, th {
     padding: 2px 4px 2px 4px;
 }
 
+#agg td, th {
+	padding: 2px 18px 2px 4px;
+	margin-right: 10px;
+}
+
+
 #agg_table td {
     min-width: 110px;
 }
