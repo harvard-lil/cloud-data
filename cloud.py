@@ -227,7 +227,7 @@ def sum_cloud_providers(result_file):
     with open(result_file, 'rb') as csvfile:
         rows = csv.reader(csvfile, delimiter=',')
         for row in rows:
-                if row[5] not in ignore_list:
+                if row[5] and row[5] not in ignore_list:
                     total += 1
                     sums[int(row[3])] += 1
                     
@@ -262,6 +262,6 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
-    sum_cloud_providers('data/results/crunchbase_2010.csv')
+    sum_cloud_providers('data/results/crunchbase_2006.csv')
     #convert_to_table('top_2000.csv')
     #get_aggregate_table('top_2000.csv')
