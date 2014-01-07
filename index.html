@@ -17,7 +17,13 @@
   </head>
   <body>
 	<div class="container">
-	      <h1 id="details">Summary of datasets</h1>
+		<h1>Cloud investigation</h1>
+		<p>The below summarizes a rough investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites, as measured by US traffic,by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
+		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from 2006 through present (Jan, 2014). Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the dataset. This data was sliced by year.</p>
+		<p>The Alexa data was gathered from <a href="http://aws.amazon.com/awis/">Amazon's Alexa Web Information Service</a> and represents the 2000 most popular sites based on US traffic.</p>
+		<p>Five of the most popular cloud hosts, Google, Microsoft, Softlayer, Rackspace, and Amazon, were tracked across these domains.</p>
+		<p>For each domain name, the IP address was retrieved. From this IP address, the organization retrieved from <a href="http://arin.net">ARIN</a>.</p>
+	      <h2 id="details">Summary of CrunchBase and Alexa datasets</h2>
 			<table class="table-striped table-hover" id="agg">
 		    	<thead>
 				<tr>
@@ -32,7 +38,7 @@
 				</tr>
 				</thead>
 				<tr>
-					<td><a href="tc_2006.html">CrunchBase 2006</a></td>
+					<td><a href="data/downloads/crunchbase_2006.csv">CrunchBase 2006</a></td>
 					<td>2467</td>
 					<td>357 or 14.47%</td>
 					<td>40 or 1.62%</td>
@@ -42,7 +48,7 @@
 					<td>1968 or 79.77%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2007.html">CrunchBase 2007</a></td>
+					<td><a href="data/downloads/crunchbase_2007.csv">CrunchBase 2007</a></td>
 					<td>3493</td>
 					<td>564 or 16.15%</td>
 					<td>82 or 2.35%</td>
@@ -52,7 +58,7 @@
 					<td>2715 or 77.73%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2008.html">CrunchBase 2008</a></td>
+					<td><a href="data/downloads/crunchbase_2008.csv">CrunchBase 2008</a></td>
 					<td>4435</td>
 					<td>679 or 15.31%</td>
 					<td>113 or 2.55%</td>
@@ -62,7 +68,7 @@
 					<td>3479 or 78.44%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2009.html">CrunchBase 2009</a></td>
+					<td><a href="data/downloads/crunchbase_2009.csv">CrunchBase 2009</a></td>
 					<td>6907</td>
 					<td>1822 or 26.38%</td>
 					<td>89 or 1.29%</td>
@@ -72,7 +78,7 @@
 					<td>4613 or 66.79%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2010.html">CrunchBase 2010</a></td>
+					<td><a href="data/downloads/crunchbase_2010.csv">CrunchBase 2010</a></td>
 					<td>6160</td>
 					<td>1310 or 21.27%</td>
 					<td>147 or 2.39%</td>
@@ -82,7 +88,7 @@
 					<td>4429 or 71.90%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2011.html">CrunchBase 2011</a></td>
+					<td><a href="data/downloads/crunchbase_2011.csv">CrunchBase 2011</a></td>
 					<td>6905</td>
 					<td>1806 or 26.15%</td>
 					<td>89 or 1.29%</td>
@@ -92,7 +98,7 @@
 					<td>4629 or 67.04%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2012.html">CrunchBase 2012</a></td>
+					<td><a href="data/downloads/crunchbase_2012.csv">CrunchBase 2012</a></td>
 					<td>6742</td>
 					<td>1844 or 27.35%</td>
 					<td>90 or 1.33%</td>
@@ -102,7 +108,7 @@
 					<td>4390 or 65.11%</td>
 				</tr>
 				<tr>
-					<td><a href="tc_2013.html">CrunchBase 2013</a></td>
+					<td><a href="data/downloads/crunchbase_2010_2013.csv">CrunchBase 2013</a></td>
 					<td>4086</td>
 					<td>1052 or 25.75%</td>
 					<td>28 or 0.69%</td>
@@ -112,7 +118,7 @@
 					<td>2763 or 67.62%</td>
 				</tr>
 				<tr>
-					<td><a href="alexa_2000.html">Alexa Top 2000</a></td>
+					<td><a href="data/downloads/top_2000.csv">Alexa Top 2000</a></td>
 					<td>1469</td>
 					<td>179 or 12.19%</td>
 					<td>5 or 0.34%</td>
@@ -122,7 +128,8 @@
 					<td>1192 or 81.14%</td>
 				</tr>
 			</table> <!-- / agg table -->
-			<div class="text-center">
+			<h2>CrunchBase data, graphed</h2>
+			<div id="graph_container">
 			<script src="js/d3.v3.min.js"></script>
 			<script>
 
@@ -150,7 +157,7 @@
 			    .orient("left")
 			    .tickFormat(d3.format(".2s"));
 
-			var svg = d3.select(".text-center").append("svg")
+			var svg = d3.select("#graph_container").append("svg")
 			    .attr("width", width + margin.left + margin.right)
 			    .attr("height", height + margin.top + margin.bottom)
 			  .append("g")
@@ -219,20 +226,15 @@
 			});
 
 			</script>
-</div>
-			<h1 id="methodology">Methodology</h1>
-	      	<p></p>
-			
-			<h1 id="methodology">Notes on quality of data</h1>
-	      	<p>
-				Retrieve <a href="http://www.alexa.com/topsites/countries%3b0/US">top 250 sites in the US from Alexa.</a> For each name get its IP address. Then, find the organization that owns the IP address through <a href="https://www.arin.net/resources/whoisrws/whois_api.html">ARIN's API.</a>
-			</p>
-			<p>Known issues:</p> 
+			</div>
+
+			<h2>Known issues</h2>
+			<p>The above is a rough first pass at data gathering. There were a number of corner cases that were ignored during the harvest.</p>
 			<ul>
-				<li>Addresses not managed by ARIN are not mapped.</li>
-				<li>Some IP addresses don't have orgs publicly listed.</li>
-				<li>If a zone is managed by third party (Akamai or CloudFlare might be common), they might be acting as proxy.</li>
-				<li>Many places use round-robin DNS (different IPs managed by different orgs).</li>
+				<li>Addresses not managed by ARIN are not mapped and not included in the totals</li>
+				<li>ARIN does not display some organizations publicly and not included in the totals</li>
+				<li>If a zone is managed by third party (Akamai or CloudFlare might be common), they might be acting as proxy</li>
+				<li>Many places use round-robin DNS (different IPs managed by different orgs)</li>
 			</ul>
 	</div> <!-- /container -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

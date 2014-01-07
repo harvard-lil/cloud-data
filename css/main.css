@@ -36,18 +36,21 @@ ul {
     font-size: 16px;
 }
 
-
-.axis path,
+svg .axis path,
 .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-.bar {
+svg .bar {
   fill: steelblue;
 }
 
-.x.axis path {
+svg .x.axis path {
   display: none;
+}
+
+svg {
+    font-size: 12px;
 }

@@ -187,17 +187,34 @@ def convert_to_table(result_file):
     
     result_file = file with ARIN details. 
     """
+
+    ignore_list = ['RIPE', 'APNIC', 'AFRINIC', 'LACNIC']
+    cloud_providers = ['Other', 'Amazon', 'Rackspace', 'Softlayer', 'Microsoft', 'Google']
     
     print "converting to table"
     
+    total = 0
     with open(result_file, 'rb') as csvfile:
         rows = csv.reader(csvfile, delimiter=',')
         for row in rows:
-            print "<tr>"
-            for item in row:
-                print "<td>%s</td>" % item
-            print "</tr>"
+            if row[5] and row[5] not in ignore_list:
+                total += 1
+                print "<tr>"
+            
+                # rank 
+                #print '<td>%s</td>' % row[0]
+                # cloud provider
+                print '<td class="%s">%s</td>' % (cloud_providers[int(row[3])], cloud_providers[int(row[3])])
+                # ip
+                print '<td>%s</td>' % row[1]
+                # ip
+                print '<td>%s</td>' % row[2]
+                # ip owner
+                print '<td><a href="http://whois.arin.net/rest/org/%s">%s</a></td>' % (row[5], row[4])
+            
+                print "</tr>"
 
+    print "total is %s" % total
 def get_aggregate_table(result_file, cloud_providers):
     """
     Get aggregate numbers. Count up names in cloud. Get percent of names and
@@ -262,6 +279,6 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
-    sum_cloud_providers('data/results/crunchbase_2009.csv')
-    #convert_to_table('top_2000.csv')
+    #sum_cloud_providers('data/results/crunchbase_2009.csv')
+    convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
