@@ -129,7 +129,11 @@
 				</tr>
 			</table> <!-- / agg table -->
 			<h2>CrunchBase data, graphed</h2>
-			<div id="graph_container">
+			<div id="graph_container"></div>
+			<p class="graph_caption">Cloud services by year</p>
+			<div id="line_graph_container"></div>
+			<p class="graph_caption">Total percent of cloud hosted domains by year</p>
+			
 			<script src="js/d3.v3.min.js"></script>
 			<script>
 
@@ -225,14 +229,70 @@
 
 			});
 
-			</script>
-			</div>
+
+				var lineParseDate = d3.time.format("%Y").parse;
+
+				var line_x = d3.time.scale()
+				    .range([0, width]);
+
+				var line_y = d3.scale.linear()
+				    .range([height, 0]);
+
+				var line_xAxis = d3.svg.axis()
+				    .scale(line_x)
+				    .orient("bottom");
+
+				var line_yAxis = d3.svg.axis()
+				    .scale(line_y)
+				    .orient("left");
+
+				var line_line = d3.svg.line()
+				    .x(function(d) { return line_x(d.date); })
+				    .y(function(d) { return line_y(d.close); });
+
+				var line_svg = d3.select("#line_graph_container").append("svg")
+				    .attr("width", width + margin.left + margin.right)
+				    .attr("height", height + margin.top + margin.bottom)
+				  .append("g")
+				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				d3.tsv("data.tsv", function(error, data) {
+				  data.forEach(function(d) {
+				    d.date = lineParseDate(d.date);
+				    d.close = +d.close;
+				  });
+
+				  line_x.domain(d3.extent(data, function(d) { return d.date; }));
+				  line_y.domain([0,50]);
+
+				  line_svg.append("g")
+				      .attr("class", "x axis")
+				      .attr("transform", "translate(0," + height + ")")
+				      .call(line_xAxis);
+
+				  line_svg.append("g")
+				      .attr("class", "y axis")
+				      .call(line_yAxis)
+				    .append("text")
+				      .attr("transform", "rotate(-90)")
+				      .attr("y", 6)
+				      .attr("dy", ".71em")
+				      .style("text-anchor", "end")
+				      .text("Percent");
+
+				  line_svg.append("path")
+				      .datum(data)
+				      .attr("class", "line")
+				      .attr("d", line_line);
+				});
+
+				</script>	
 
 			<h2>Known issues</h2>
 			<p>The above is a rough first pass at data gathering. There were a number of corner cases that were ignored during the harvest.</p>
 			<ul>
 				<li>Addresses not managed by ARIN are not mapped and not included in the totals</li>
-				<li>ARIN does not display some organizations publicly and not included in the totals</li>
+				<li>ARIN does not display some organizations publicly. These are not included in the totals</li>
 				<li>If a zone is managed by third party (Akamai or CloudFlare might be common), they might be acting as proxy</li>
 				<li>Many places use round-robin DNS (different IPs managed by different orgs)</li>
 			</ul>

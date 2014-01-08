@@ -36,6 +36,15 @@ ul {
     font-size: 16px;
 }
 
+.graph_caption {
+	font-size: 12px;
+	margin-left: 15px;
+}
+
+h2 {
+	margin-top: 50px;
+}
+
 svg .axis path,
 .axis line {
   fill: none;
@@ -47,10 +56,20 @@ svg .bar {
   fill: steelblue;
 }
 
-svg .x.axis path {
+/*svg .x.axis path {
   display: none;
+}*/
+
+#line_graph_container {
+	margin-top: 50px;
 }
 
 svg {
     font-size: 12px;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
 }
