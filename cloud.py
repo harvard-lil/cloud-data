@@ -2,6 +2,8 @@ import dns.resolver
 import time, json, re, csv, ConfigParser, re
 import requests
 import tldextract
+from tempfile import NamedTemporaryFile
+import shutil
 
 # loop through lines in top_2000_alexa_sites.txt
 # for line, get the IP of the name contained in the line
@@ -92,6 +94,49 @@ def get_arin_data(domain_list, result_file):
         a = csv.writer(fp, delimiter=',')
         a.writerows(rows)
         
+
+def get_ripe_data(result_file):
+    # Sometimes the IP isn't owned by ARIN.
+    #
+    # This function operates on the result file produced by our ARIN-related
+    # function. We'll loop through the CSV and if the row pointes to RIPE,
+    # we'll operate on it.
+
+    tempfile = NamedTemporaryFile(delete=False)
+
+    with open(result_file, 'rb') as csvfile:
+        rows = csv.reader(csvfile, delimiter=',')
+        writer = csv.writer(tempfile, delimiter=',', quotechar='"')
+        
+        for row in rows:
+            if row[5] and row[5] == 'RIPE':
+                # Let's hit the RIPE API
+                
+                url = "http://rest.db.ripe.net/search?query-string=%s" % row[2]
+                print url
+                headers = {'Accept': 'application/json'}
+                r = requests.get(url, headers=headers)
+                decoded_json = json.loads(r.text)
+                
+                attributes = decoded_json['objects']['object'][0]['attributes']['attribute']
+                
+                for attribute in attributes:
+                    if 'name' in attribute:
+                        print attribute
+                
+                #row 4 becomes org name
+                #row 5 becomes org handle
+                #print row[4]
+                #print row[5]
+                # write the row out to our temp file
+                #writer.writerow(row)
+                time.sleep(1) 
+                break
+    
+    
+    # all done rewriting. 
+    #shutil.move(tempfile.name, result_file)
+        
 def get_crunchbase_data(crunchbase_key, raw_companies_file):
     """
     given a year, get the domain names for all startups using the cruncbase api
@@ -179,7 +224,6 @@ def get_crunchbase_data(crunchbase_key, raw_companies_file):
 
         count += 1
 
-        
 def convert_to_table(result_file):
     """
     Read rank, name, address, etc data from csv and write it out to 
@@ -215,6 +259,7 @@ def convert_to_table(result_file):
                 print "</tr>"
 
     print "total is %s" % total
+    
 def get_aggregate_table(result_file, cloud_providers):
     """
     Get aggregate numbers. Count up names in cloud. Get percent of names and
@@ -254,7 +299,6 @@ def sum_cloud_providers(result_file):
         perc = "{0:.2f}%".format(float(sum)/total * 100)
         print "<td>%s or %s</td>" % (sum, perc)
 
-
 if __name__ == "__main__":
     """
     get alexa names, get the top 2000 sites from alex and dump them in a file
@@ -279,6 +323,7 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
+    get_ripe_data('data/results/crunchbase_2013.csv')
     #sum_cloud_providers('data/results/crunchbase_2009.csv')
-    convert_to_table('data/results/crunchbase_2009.csv')
+    #convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
