@@ -108,7 +108,7 @@ def get_ripe_data(result_file):
 
     org_pattern = re.compile('([^\s]+)')
 
-    count = 1
+    count = 0
 
     with open(result_file, 'rb') as csvfile:
         rows = csv.reader(csvfile, delimiter=',')
@@ -141,15 +141,11 @@ def get_ripe_data(result_file):
                         matches = org_pattern.match(descr_value)
                         new_row[5] = matches.group(1)
 
-
-                        # write the row out to our temp file
-                        writer.writerow(new_row)
-                        print row
-                        print new_row
-                        time.sleep(1)
-                        break
-
                 count += 1
+                    
+            # write the row out to our temp file
+            writer.writerow(new_row)
+            time.sleep(1)
                 
     # all done rewriting.
     shutil.move(tempfile.name, result_file)
