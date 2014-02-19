@@ -1,5 +1,5 @@
 import dns.resolver
-import time, json, re, csv, ConfigParser, re
+import time, json, re, csv, ConfigParser, re, subprocess
 import requests
 import tldextract
 from tempfile import NamedTemporaryFile
@@ -102,40 +102,58 @@ def get_ripe_data(result_file):
     # function. We'll loop through the CSV and if the row pointes to RIPE,
     # we'll operate on it.
 
+    cloud_providers = ['amazon', 'rackspace', 'softlayer', 'microsoft', 'google']
+
     tempfile = NamedTemporaryFile(delete=False)
+
+    org_pattern = re.compile('([^\s]+)')
+
+    count = 1
 
     with open(result_file, 'rb') as csvfile:
         rows = csv.reader(csvfile, delimiter=',')
         writer = csv.writer(tempfile, delimiter=',', quotechar='"')
         
         for row in rows:
-            if row[5] and row[5] == 'RIPE':
-                # Let's hit the RIPE API
+            new_row = row
+            
+            if row[5] and row[5] == 'RIPE' or row[5] == '':
+                # Let's hit the RIPE WHOIS server
                 
-                url = "http://rest.db.ripe.net/search?query-string=%s" % row[2]
-                print url
-                headers = {'Accept': 'application/json'}
-                r = requests.get(url, headers=headers)
-                decoded_json = json.loads(r.text)
+                whois_output = subprocess.check_output(['whois', '-h', 'riswhois.ripe.net', row[2]])
                 
-                attributes = decoded_json['objects']['object'][0]['attributes']['attribute']
+                tokenized = whois_output.split('\n')
                 
-                for attribute in attributes:
-                    if 'name' in attribute:
-                        print attribute
+                for token in tokenized:
+                    if token.startswith('descr:'):
+                        descr_tokens = token.split(':')
+                        for cloud_provider in cloud_providers:
+                            descr_value = descr_tokens[1].strip()
+                            if bool(re.search(cloud_provider, descr_value.lower())):
+                                new_row[3] = cloud_providers.index(cloud_provider) + 1
+                                break
+                            else:
+                                new_row[3] = 0
+                                
+                        new_row[4] = descr_value
+                        
+                        #grab anything that's not a space
+                        matches = org_pattern.match(descr_value)
+                        new_row[5] = matches.group(1)
+
+
+                        # write the row out to our temp file
+                        writer.writerow(new_row)
+                        print row
+                        print new_row
+                        time.sleep(1)
+                        break
+
+                count += 1
                 
-                #row 4 becomes org name
-                #row 5 becomes org handle
-                #print row[4]
-                #print row[5]
-                # write the row out to our temp file
-                #writer.writerow(row)
-                time.sleep(1) 
-                break
-    
-    
-    # all done rewriting. 
-    #shutil.move(tempfile.name, result_file)
+    # all done rewriting.
+    shutil.move(tempfile.name, result_file)
+    print "Updated %s rows" % count
         
 def get_crunchbase_data(crunchbase_key, raw_companies_file):
     """
