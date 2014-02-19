@@ -337,7 +337,14 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
-    get_ripe_data('data/results/crunchbase_2013.csv')
+    result_files = ['data/results/crunchbase_2006.csv', 
+        'data/results/crunchbase_2007.csv', 'data/results/crunchbase_2008.csv',
+        'data/results/crunchbase_2009.csv', 'data/results/crunchbase_2010.csv',
+        'data/results/crunchbase_2011.csv', 'data/results/crunchbase_2012.csv',
+        'data/results/top_2000.csv']
+    
+    for result_file in result_files:
+        get_ripe_data(result_file)
     #sum_cloud_providers('data/results/crunchbase_2009.csv')
     #convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
