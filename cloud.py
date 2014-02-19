@@ -136,10 +136,16 @@ def get_ripe_data(result_file):
                                 new_row[3] = 0
                                 
                         new_row[4] = descr_value
-                        
-                        #grab anything that's not a space
+
+                        # try to get an org handle by grabbing
+                        # the first chunk before the space
+                        org_handle = descr_value
                         matches = org_pattern.match(descr_value)
-                        new_row[5] = matches.group(1)
+
+                        if matches:
+                            org_handle = matches.group(1)
+
+                        new_row[5] = org_handle
 
                 count += 1
                     
@@ -337,8 +343,7 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
-    result_files = ['data/results/crunchbase_2006.csv', 
-        'data/results/crunchbase_2007.csv', 'data/results/crunchbase_2008.csv',
+    result_files = ['data/results/crunchbase_2008.csv',
         'data/results/crunchbase_2009.csv', 'data/results/crunchbase_2010.csv',
         'data/results/crunchbase_2011.csv', 'data/results/crunchbase_2012.csv',
         'data/results/top_2000.csv']
