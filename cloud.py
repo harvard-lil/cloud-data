@@ -156,7 +156,72 @@ def get_ripe_data(result_file):
     # all done rewriting.
     shutil.move(tempfile.name, result_file)
     print "Updated %s rows" % count
+
+
+def fill_void(result_file):
+    # Some of our results don't have a full set of values. Let's hit ripe for them
+
+    cloud_providers = ['amazon', 'rackspace', 'softlayer', 'microsoft', 'google']
+
+    tempfile = NamedTemporaryFile(delete=False)
+
+    org_pattern = re.compile('([^\s]+)')
+
+    count = 0
+
+    with open(result_file, 'rb') as csvfile:
+        rows = csv.reader(csvfile, delimiter=',')
+        writer = csv.writer(tempfile, delimiter=',', quotechar='"')
         
+        for row in rows:
+            new_row = row
+            
+            if not row[4]:
+                # Let's hit the RIPE WHOIS server
+                
+                name = row[1]
+                try:
+                    answers = dns.resolver.query(name, 'A')
+                    ip_address = answers[0].address
+                    whois_output = subprocess.check_output(['whois', '-h', 'riswhois.ripe.net', ip_address])
+                    tokenized = whois_output.split('\n')
+                
+                    for token in tokenized:
+                        if token.startswith('descr:'):
+                            descr_tokens = token.split(':')
+                            for cloud_provider in cloud_providers:
+                                descr_value = descr_tokens[1].strip()
+                                if bool(re.search(cloud_provider, descr_value.lower())):
+                                    new_row[3] = cloud_providers.index(cloud_provider) + 1
+                                    break
+                                else:
+                                    new_row[3] = 0
+                                
+                            new_row[4] = descr_value
+
+                            # try to get an org handle by grabbing
+                            # the first chunk before the space
+                            org_handle = descr_value
+                            matches = org_pattern.match(descr_value)
+
+                            if matches:
+                                org_handle = matches.group(1)
+
+                            new_row[5] = org_handle
+
+                    count += 1
+                except:
+                    pass
+                
+            # write the row out to our temp file
+            writer.writerow(new_row)
+            time.sleep(1)
+                
+    # all done rewriting.
+    shutil.move(tempfile.name, result_file)
+    print "Updated %s rows" % count
+    
+    
 def get_crunchbase_data(crunchbase_key, raw_companies_file):
     """
     given a year, get the domain names for all startups using the cruncbase api
@@ -350,7 +415,9 @@ if __name__ == "__main__":
         'data/results/top_2000.csv']
     
     for result_file in result_files:
-        get_ripe_data(result_file)
+    #    get_ripe_data(result_file)
+        fill_void(result_file)
+    
     #sum_cloud_providers('data/results/crunchbase_2009.csv')
     #convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
