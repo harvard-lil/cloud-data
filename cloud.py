@@ -371,21 +371,25 @@ def sum_cloud_providers(result_file):
     
     ignore_list = ['RIPE', 'APNIC', 'AFRINIC', 'LACNIC']
     
+    cloud_providers = ['none', 'amazon', 'rackspace', 'softlayer', 'microsoft', 'google']
+    
     total = 0
     sums = [0,0,0,0,0,0]
     
     with open(result_file, 'rb') as csvfile:
         rows = csv.reader(csvfile, delimiter=',')
         for row in rows:
-                if row[5] and row[5] not in ignore_list:
-                    total += 1
-                    sums[int(row[3])] += 1
+            if row[5]:
+                total += 1
+                sums[int(row[3])] += 1
                     
     print "total %s names" % total
     
+    count = 0
     for sum in sums:
         perc = "{0:.2f}%".format(float(sum)/total * 100)
-        print "<td>%s or %s</td>" % (sum, perc)
+        print "<td>%s, %s or %s</td>" % (cloud_providers[count], sum, perc)
+        count += 1
 
 if __name__ == "__main__":
     """
@@ -417,10 +421,10 @@ if __name__ == "__main__":
         'data/results/crunchbase_2011.csv', 'data/results/crunchbase_2012.csv',
         'data/results/crunchbase_2013.csv', 'data/results/top_2000.csv']
     
-    for result_file in result_files:
+    #for result_file in result_files:
     #    get_ripe_data(result_file)
-        fill_void(result_file)
+    #    fill_void(result_file)
     
-    #sum_cloud_providers('data/results/crunchbase_2009.csv')
+    sum_cloud_providers('data/results/crunchbase_2007.csv')
     #convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
