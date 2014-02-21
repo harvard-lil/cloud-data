@@ -170,19 +170,23 @@ def fill_void(result_file):
     count = 0
 
     with open(result_file, 'rb') as csvfile:
-        rows = csv.reader(csvfile, delimiter=',')
+        rows = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
         writer = csv.writer(tempfile, delimiter=',', quotechar='"')
         
         for row in rows:
             new_row = row
             
-            if not row[4]:
+            if len(row) >= 5 and not row[4]:
                 # Let's hit the RIPE WHOIS server
                 
                 name = row[1]
+
+                # cleanup an old bug
+                new_row[2] = ''
                 try:
                     answers = dns.resolver.query(name, 'A')
                     ip_address = answers[0].address
+                    new_row[2] = ip_address
                     whois_output = subprocess.check_output(['whois', '-h', 'riswhois.ripe.net', ip_address])
                     tokenized = whois_output.split('\n')
                 
@@ -215,7 +219,6 @@ def fill_void(result_file):
                 
             # write the row out to our temp file
             writer.writerow(new_row)
-            time.sleep(1)
                 
     # all done rewriting.
     shutil.move(tempfile.name, result_file)
@@ -408,11 +411,11 @@ if __name__ == "__main__":
     
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
-    result_files = ['data/results/crunchbase_2006.csv',
-        'data/results/crunchbase_2007.csv', 'data/results/crunchbase_2008.csv',
+    result_files = [
+        'data/results/crunchbase_2008.csv',
         'data/results/crunchbase_2009.csv', 'data/results/crunchbase_2010.csv',
         'data/results/crunchbase_2011.csv', 'data/results/crunchbase_2012.csv',
-        'data/results/top_2000.csv']
+        'data/results/crunchbase_2013.csv', 'data/results/top_2000.csv']
     
     for result_file in result_files:
     #    get_ripe_data(result_file)
