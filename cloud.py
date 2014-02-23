@@ -381,7 +381,7 @@ def sum_cloud_providers(result_file):
                 total += 1
                 sums[int(row[3])] += 1
                     
-    print "total %s names" % total        
+    print "<td>%s</td>" % (total)
     
     total_in_cloud = 0
     
@@ -389,12 +389,12 @@ def sum_cloud_providers(result_file):
         total_in_cloud += sum
         
     perc = "{0:.2f}%".format(float(total_in_cloud)/total * 100)
-    print "Total in cloud %s or  %s percent" % (total_in_cloud, perc)
+    print "<td>%s or %s</td>" % (total_in_cloud, perc)
     
     count = 0
     for sum in sums:
         perc = "{0:.2f}%".format(float(sum)/total * 100)
-        print "<td>%s, %s or %s</td>" % (cloud_providers[count], sum, perc)
+        print "<td>%s or %s</td>" % (sum, perc)
         count += 1
 
 if __name__ == "__main__":
