@@ -176,9 +176,8 @@ def fill_void(result_file):
         for row in rows:
             new_row = row
             
-            if len(row) >= 5 and not row[4]:
+            if len(row) >= 5 and row[5] == 'AFRINIC':
                 # Let's hit the RIPE WHOIS server
-                
                 name = row[1]
 
                 # cleanup an old bug
@@ -216,7 +215,6 @@ def fill_void(result_file):
                     count += 1
                 except:
                     pass
-                
             # write the row out to our temp file
             writer.writerow(new_row)
                 
@@ -383,7 +381,15 @@ def sum_cloud_providers(result_file):
                 total += 1
                 sums[int(row[3])] += 1
                     
-    print "total %s names" % total
+    print "total %s names" % total        
+    
+    total_in_cloud = 0
+    
+    for sum in sums[1:]:
+        total_in_cloud += sum
+        
+    perc = "{0:.2f}%".format(float(total_in_cloud)/total * 100)
+    print "Total in cloud %s or  %s percent" % (total_in_cloud, perc)
     
     count = 0
     for sum in sums:
@@ -416,15 +422,18 @@ if __name__ == "__main__":
     #get_crunchbase_data(crunchbase_key, 'crunchbase_companies.json')
     #get_arin_data('data/crunchbase_details_2010.txt', 'data/results/crunchbase_2010.csv')
     result_files = [
+        'data/results/crunchbase_2006.csv', 'data/results/crunchbase_2007.csv',
         'data/results/crunchbase_2008.csv',
         'data/results/crunchbase_2009.csv', 'data/results/crunchbase_2010.csv',
         'data/results/crunchbase_2011.csv', 'data/results/crunchbase_2012.csv',
         'data/results/crunchbase_2013.csv', 'data/results/top_2000.csv']
-    
-    #for result_file in result_files:
+
+    for result_file in result_files:
     #    get_ripe_data(result_file)
     #    fill_void(result_file)
+        print result_file
+        sum_cloud_providers(result_file)
+        print "\n"
     
-    sum_cloud_providers('data/results/crunchbase_2007.csv')
     #convert_to_table('data/results/crunchbase_2009.csv')
     #get_aggregate_table('top_2000.csv')
