@@ -18,9 +18,9 @@
   <body>
 	<div class="container">
 		<h1>Cloud investigation</h1>
-		<p>The below summarizes an investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites, as measured by US traffic, by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
-		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from 2006 through present (Jan, 2014). Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the datasets. This data was sliced by year.</p>
-		<p>The Alexa data was gathered from <a href="http://aws.amazon.com/awis/">Amazon's Alexa Web Information Service</a> and represents the 2000 most popular sites based on US traffic (as measured on December 22, 2013).</p>
+		<p>The below summarizes an investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites on the Web, as measured by US traffic, by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
+		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from January 1, 2006 through January, 1 2014. Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the datasets. This data was sliced by year.</p>
+		<p>The Alexa data was gathered from <a href="http://aws.amazon.com/awis/">Amazon's Alexa Web Information Service</a> and represents the 2000 most popular sites based on US traffic as measured on December 22, 2013.</p>
 		<p>Five of the most popular cloud hosts, Google, Microsoft, SoftLayer, Rackspace, and Amazon, were tracked across these domains.</p>
 		<p>For each domain name, the IP address was retrieved. From this IP address, the organization was retrieved from <a href="http://arin.net">ARIN</a>. If this organization was in our list of five cloud hosts, the count for the cloud host was incremented.</p>
 	      <h2 id="details">Summary of CrunchBase and Alexa datasets</h2>
@@ -145,7 +145,7 @@
 			<h2>CrunchBase data, linear regression</h2>
 			<div><img src="img/crunchbase_lin_reg.jpg"></div>
 			<br/><br/>
-			<p>A linear regression of the CrunchBase data shows a reasonable fit. An upward trend in cloude usage appears to be a reasonable interpretation.</p>
+			<p>A linear regression of the CrunchBase produces a line with a reasonable fit. An upward trend in cloud usage appears to be a reasonable interpretation.</p>
 			
 			<script src="js/d3.v3.min.js"></script>
 			<script>
@@ -241,14 +241,7 @@
 			      .text(function(d) { return d; });
 
 			});
-			</script>	
-
-			<h2>Known issues</h2>
-			<p>The above data is reliable is most cases, however there were a few corner cases that were ignored during the harvest.</p>
-			<ul>
-				<li>If a zone is managed by third party (Akamai or CloudFlare might be common), they might be acting as proxy</li>
-				<li>Many places use round-robin DNS (different IPs managed by different orgs). It's possible, though seems like it would be unlikely that we'd get different answers for different requests.</li>
-			</ul>
+			</script>
 	</div> <!-- /container -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery.js"></script>
