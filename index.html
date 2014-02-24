@@ -18,11 +18,11 @@
   <body>
 	<div class="container">
 		<h1>Cloud investigation</h1>
-		<p>The below summarizes a rough investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites, as measured by US traffic, by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
-		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from 2006 through present (Jan, 2014). Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the dataset. This data was sliced by year.</p>
+		<p>The below summarizes an investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites, as measured by US traffic, by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
+		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from 2006 through present (Jan, 2014). Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the datasets. This data was sliced by year.</p>
 		<p>The Alexa data was gathered from <a href="http://aws.amazon.com/awis/">Amazon's Alexa Web Information Service</a> and represents the 2000 most popular sites based on US traffic (as measured on December 22, 2013).</p>
 		<p>Five of the most popular cloud hosts, Google, Microsoft, SoftLayer, Rackspace, and Amazon, were tracked across these domains.</p>
-		<p>For each domain name, the IP address was retrieved. From this IP address, the organization was retrieved from <a href="http://arin.net">ARIN</a>. If this organization was in our list of five cloud hosts, the count for the cloud host was incremented. If the organization was not mapped to one of the five cloud hosts it was counted as "Other."</p>
+		<p>For each domain name, the IP address was retrieved. From this IP address, the organization was retrieved from <a href="http://arin.net">ARIN</a>. If this organization was in our list of five cloud hosts, the count for the cloud host was incremented.</p>
 	      <h2 id="details">Summary of CrunchBase and Alexa datasets</h2>
 			<table class="table-striped table-hover" id="agg">
 		    	<thead>
@@ -138,11 +138,14 @@
 					<td>24 or 1.29%</td>
 				</tr>
 			</table> <!-- / agg table -->
-			<h2>CrunchBase data, graphed</h2>
+			<h2>CrunchBase data, stacked bars</h2>
 			<div id="graph_container"></div>
 			<p class="graph_caption">Cloud services by year</p>
-			<div id="line_graph_container"></div>
-			<p class="graph_caption">Total percent of cloud hosted domains by year</p>
+			<br/>
+			<h2>CrunchBase data, linear regression</h2>
+			<div><img src="img/crunchbase_lin_reg.jpg"></div>
+			<br/><br/>
+			<p>A linear regression of the CrunchBase data shows a reasonable fit. An upward trend in cloude usage appears to be a reasonable interpretation.</p>
 			
 			<script src="js/d3.v3.min.js"></script>
 			<script>
@@ -151,19 +154,17 @@
 			    width = 960 - margin.left - margin.right,
 			    height = 500 - margin.top - margin.bottom;
 
-			var x0 = d3.scale.ordinal()
+			var x = d3.scale.ordinal()
 			    .rangeRoundBands([0, width], .1);
 
-			var x1 = d3.scale.ordinal();
-
 			var y = d3.scale.linear()
-			    .range([height, 0]);
+			    .rangeRound([height, 0]);
 
 			var color = d3.scale.ordinal()
 			    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
 			var xAxis = d3.svg.axis()
-			    .scale(x0)
+			    .scale(x)
 			    .orient("bottom");
 
 			var yAxis = d3.svg.axis()
@@ -171,29 +172,32 @@
 			    .orient("left")
 			    .tickFormat(d3.format(".2s"));
 
-			var svg = d3.select("#graph_container").append("svg")
+			var bar_svg = d3.select("#graph_container").append("svg")
 			    .attr("width", width + margin.left + margin.right)
 			    .attr("height", height + margin.top + margin.bottom)
 			  .append("g")
 			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			d3.csv("data.csv", function(error, data) {
-			  var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "ds"; });
+			  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "ds"; }));
 
 			  data.forEach(function(d) {
-			    d.ages = ageNames.map(function(name) { return {name: name, value: +d[name]}; });
+			    var y0 = 0;
+			    d.ages = color.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
+			    d.total = d.ages[d.ages.length - 1].y1;
 			  });
 
-			  x0.domain(data.map(function(d) { return d.ds; }));
-			  x1.domain(ageNames).rangeRoundBands([0, x0.rangeBand()]);
-			  y.domain([0, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+			  /*data.sort(function(a, b) { return b.total - a.total; });*/
 
-			  svg.append("g")
+			  x.domain(data.map(function(d) { return d.ds; }));
+			  y.domain([0, d3.max(data, function(d) { return d.total; })]);
+
+			  bar_svg.append("g")
 			      .attr("class", "x axis")
 			      .attr("transform", "translate(0," + height + ")")
 			      .call(xAxis);
 
-			  svg.append("g")
+			  bar_svg.append("g")
 			      .attr("class", "y axis")
 			      .call(yAxis)
 			    .append("text")
@@ -201,110 +205,49 @@
 			      .attr("y", 6)
 			      .attr("dy", ".71em")
 			      .style("text-anchor", "end")
-			      .text("Percent");
+			      .text("Percent of total names");
 
-			  var ds = svg.selectAll(".ds")
+			  var ds = bar_svg.selectAll(".ds")
 			      .data(data)
 			    .enter().append("g")
 			      .attr("class", "g")
-			      .attr("transform", function(d) { return "translate(" + x0(d.ds) + ",0)"; });
+			      .attr("transform", function(d) { return "translate(" + x(d.ds) + ",0)"; });
 
 			  ds.selectAll("rect")
 			      .data(function(d) { return d.ages; })
 			    .enter().append("rect")
-			      .attr("width", x1.rangeBand())
-			      .attr("x", function(d) { return x1(d.name); })
-			      .attr("y", function(d) { return y(d.value); })
-			      .attr("height", function(d) { return height - y(d.value); })
+			      .attr("width", x.rangeBand())
+			      .attr("y", function(d) { return y(d.y1); })
+			      .attr("height", function(d) { return y(d.y0) - y(d.y1); })
 			      .style("fill", function(d) { return color(d.name); });
 
-			  var legend = svg.selectAll(".legend")
-			      .data(ageNames.slice().reverse())
+			  var legend = bar_svg.selectectAll(".legend")
+			      .data(color.domain().slice().reverse())
 			    .enter().append("g")
 			      .attr("class", "legend")
 			      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
 			  legend.append("rect")
-			      .attr("x", width - 18)
+			      .attr("x", 90)
 			      .attr("width", 18)
 			      .attr("height", 18)
 			      .style("fill", color);
 
 			  legend.append("text")
-			      .attr("x", width - 24)
+			      .attr("x", 84)
 			      .attr("y", 9)
 			      .attr("dy", ".35em")
 			      .style("text-anchor", "end")
 			      .text(function(d) { return d; });
 
 			});
-
-
-				var lineParseDate = d3.time.format("%Y").parse;
-
-				var line_x = d3.time.scale()
-				    .range([0, width]);
-
-				var line_y = d3.scale.linear()
-				    .range([height, 0]);
-
-				var line_xAxis = d3.svg.axis()
-				    .scale(line_x)
-				    .orient("bottom");
-
-				var line_yAxis = d3.svg.axis()
-				    .scale(line_y)
-				    .orient("left");
-
-				var line_line = d3.svg.line()
-				    .x(function(d) { return line_x(d.date); })
-				    .y(function(d) { return line_y(d.close); });
-
-				var line_svg = d3.select("#line_graph_container").append("svg")
-				    .attr("width", width + margin.left + margin.right)
-				    .attr("height", height + margin.top + margin.bottom)
-				  .append("g")
-				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-				d3.tsv("data.tsv", function(error, data) {
-				  data.forEach(function(d) {
-				    d.date = lineParseDate(d.date);
-				    d.close = +d.close;
-				  });
-
-				  line_x.domain(d3.extent(data, function(d) { return d.date; }));
-				  line_y.domain([0,50]);
-
-				  line_svg.append("g")
-				      .attr("class", "x axis")
-				      .attr("transform", "translate(0," + height + ")")
-				      .call(line_xAxis);
-
-				  line_svg.append("g")
-				      .attr("class", "y axis")
-				      .call(line_yAxis)
-				    .append("text")
-				      .attr("transform", "rotate(-90)")
-				      .attr("y", 6)
-				      .attr("dy", ".71em")
-				      .style("text-anchor", "end")
-				      .text("Percent");
-
-				  line_svg.append("path")
-				      .datum(data)
-				      .attr("class", "line")
-				      .attr("d", line_line);
-				});
-
-				</script>	
+			</script>	
 
 			<h2>Known issues</h2>
-			<p>The above is a rough first pass at data gathering. There were a number of corner cases that were ignored during the harvest.</p>
+			<p>The above data is reliable is most cases, however there were a few corner cases that were ignored during the harvest.</p>
 			<ul>
-				<li>Addresses not managed by ARIN are not mapped and not included in the totals</li>
-				<li>ARIN does not display some organizations publicly. These are not included in the totals</li>
 				<li>If a zone is managed by third party (Akamai or CloudFlare might be common), they might be acting as proxy</li>
-				<li>Many places use round-robin DNS (different IPs managed by different orgs)</li>
+				<li>Many places use round-robin DNS (different IPs managed by different orgs). It's possible, though seems like it would be unlikely that we'd get different answers for different requests.</li>
 			</ul>
 	</div> <!-- /container -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -314,7 +257,6 @@
     <script src="js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() { 
-			console.log('loaded')
 		        $("table").tablesorter(); 
 		    } 
 		);
