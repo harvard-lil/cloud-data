@@ -21,8 +21,8 @@
 		<p>The below summarizes an investigation of cloud usage across a series of datasets from the <a href="http://www.crunchbase.com/company/techcrunch">TechCrunch CrunchBase API</a> and from the 2000 most popular sites on the Web, as measured by US traffic, by <a href="http://www.alexa.com/topsites/countries/US">Alexa</a>.</p>
 		<p>The TechCrunch CrunchBase API was used to gather all domains for all startups from January 1, 2006 through January, 1 2014. Startups that were unfunded, "deadpooled" (no longer in operation), did not list a web address, or had a web address that was not registered were removed from the datasets. This data was sliced by year.</p>
 		<p>The Alexa data was gathered from <a href="http://aws.amazon.com/awis/">Amazon's Alexa Web Information Service</a> and represents the 2000 most popular sites based on US traffic as measured on December 22, 2013.</p>
-		<p>Five of the most popular cloud hosts, Google, Microsoft, SoftLayer, Rackspace, and Amazon, were tracked across these domains.</p>
-		<p>For each domain name, the IP address was retrieved. From this IP address, the organization was retrieved from <a href="http://arin.net">ARIN</a>. If this organization was in our list of five cloud hosts, the count for the cloud host was incremented.</p>
+		<p>Five of the most popular cloud hosts, Google, Microsoft, SoftLayer, Rackspace, and Amazon, were tracked across these domains. For this study, when we say "hosted in the cloud," we simply mean that they're hosted by one of these companies.</p>
+		<p>For each domain name, the IP address was retrieved. From this IP address, the organization was retrieved from the Regional Internet Registries (ARIN, AfriNIC, LACNIC, RIPE, and APNIC). If this organization was in our list of five cloud hosts, the count for the cloud host was incremented.</p>
 	      <h2 id="details">Summary of CrunchBase and Alexa datasets</h2>
 			<table class="table-striped table-hover" id="agg">
 		    	<thead>
@@ -146,6 +146,9 @@
 			<div><img src="img/crunchbase_lin_reg.jpg"></div>
 			<br/><br/>
 			<p>A linear regression of the CrunchBase produces a line with a reasonable fit. An upward trend in cloud usage appears to be a reasonable interpretation.</p>
+			<h2>Conclusions</h2>
+			<p>The linear regression seems to suggest an upward trend in cloud adoption. There are some assumptions here. We're guessing that the startups in the CrunchBase datasets tend to continue to use the hosting service they started with. That is, if they started off using a collocated service or some other means of hosting, they continue to use that service. There's some "stickiness" to their hosting choice.</p>
+			<p>Obviously, we would like to have measured, in realtime, host choice from 2006 through now. But, given the difficulty of time travel we're relying on this stickiness of hosting service to make our best guess at a trend.</p>
 			
 			<script src="js/d3.v3.min.js"></script>
 			<script>
