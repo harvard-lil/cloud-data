@@ -224,7 +224,7 @@
 			      .attr("height", function(d) { return y(d.y0) - y(d.y1); })
 			      .style("fill", function(d) { return color(d.name); });
 
-			  var legend = bar_svg.selectectAll(".legend")
+			  var legend = bar_svg.selectAll(".legend")
 			      .data(color.domain().slice().reverse())
 			    .enter().append("g")
 			      .attr("class", "legend")
